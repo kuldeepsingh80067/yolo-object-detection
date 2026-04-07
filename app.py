@@ -1,40 +1,38 @@
 import streamlit as st
 from PIL import Image
-import base64
-from openai import OpenAI
+import numpy as np
+import tensorflow as tf
 
-st.set_page_config(page_title="AI Object Detection", page_icon="🚀")
+st.set_page_config(page_title="Object Detection Lite", page_icon="🚀")
 
-st.title("🚀 AI Object Detection (Real)")
+st.title("🚀 Object Detection (FREE & WORKING)")
 st.markdown("Built by Kuldeep Singh 💪")
 
-# 🔑 API KEY
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# Load model
+@st.cache_resource
+def load_model():
+    model = tf.keras.applications.MobileNetV2(weights="imagenet")
+    return model
 
+model = load_model()
+
+# Upload image
 uploaded_file = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"])
 
 if uploaded_file:
-    image = Image.open(uploaded_file)
+    image = Image.open(uploaded_file).resize((224, 224))
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Convert image to base64
-    img_bytes = uploaded_file.read()
-    img_base64 = base64.b64encode(img_bytes).decode()
+    img_array = np.array(image)
+    img_array = tf.keras.applications.mobilenet_v2.preprocess_input(img_array)
+    img_array = np.expand_dims(img_array, axis=0)
 
     with st.spinner("Detecting objects..."):
-        response = client.responses.create(
-            model="gpt-4.1-mini",
-            input=[{
-                "role": "user",
-                "content": [
-                    {"type": "input_text", "text": "Detect all objects in this image and list them clearly."},
-                    {"type": "input_image", "image_base64": img_base64}
-                ]
-            }]
-        )
+        predictions = model.predict(img_array)
+        decoded = tf.keras.applications.mobilenet_v2.decode_predictions(predictions, top=3)[0]
 
-        result = response.output_text
+    st.success("✅ Detection Complete")
 
-        st.success("✅ Detection Complete")
-        st.subheader("📊 Detected Objects")
-        st.write(result)
+    st.subheader("📊 Detected Objects")
+    for i, (imagenetID, label, prob) in enumerate(decoded):
+        st.write(f"{i+1}. {label} ({prob*100:.2f}%)")
