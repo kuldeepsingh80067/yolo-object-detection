@@ -1,105 +1,46 @@
-# 🤖 AI Chatbot PRO
+# 🎯 YOLO Object Detection App
 
-An advanced AI-powered chatbot built using Streamlit, featuring conversation memory, file-based context understanding, and real-time responses.
+A powerful and simple Object Detection web app built using **YOLOv8** and **Streamlit**.
+
+🚀 Detect objects in images with high accuracy and real-time performance.
 
 ---
 
-## 🌟 Features
+## 🔥 Features
 
-* ChatGPT-like chat interface
-* Session-based conversation memory
-* File upload support (TXT context chat)
-* Real-time AI responses
-* Typing animation effect
-* Clear chat functionality
-* Works with or without OpenAI API
+- 📂 Upload image and detect objects
+- 🎯 Uses YOLOv8 (Ultralytics)
+- 📊 Displays detected objects with count
+- ⚡ Fast and lightweight model
+- 🌐 Deployable on Streamlit Cloud
 
 ---
 
 ## 🛠 Tech Stack
 
-* Frontend/UI: Streamlit
-* Backend: Python
-* AI Model: OpenAI GPT (optional)
-
-Libraries used:
-
-* streamlit
-* openai
+- Python 🐍
+- Streamlit 🎨
+- YOLOv8 (Ultralytics) 🎯
+- OpenCV
+- NumPy
+- Pillow
 
 ---
 
-## 📁 Project Structure
+## 📸 How It Works
 
-ai-chatbot-pro/
-│
-├── app.py
-├── requirements.txt
-├── README.md
-└── .env (optional)
+1. Upload an image  
+2. Model detects objects  
+3. Bounding boxes are displayed  
+4. Object count is shown  
 
 ---
 
-## ⚙️ Installation & Setup
+## 📦 Installation
 
-1. Clone the repository:
+Clone the repository:
 
-```
-git clone https://github.com/your-username/ai-chatbot-pro.git
-cd ai-chatbot-pro
-```
-
-2. Install dependencies:
-
-```
-pip install -r requirements.txt
-```
-
-3. Add API key (optional but recommended):
-
-```
-OPENAI_API_KEY=your_api_key_here
-```
-
----
-
-## ▶️ Run the App
-
-```
-streamlit run app.py
-```
-
----
-
-## 🚀 Deployment (Streamlit Cloud)
-
-1. Push your code to GitHub
-2. Open Streamlit Cloud
-3. Select your repository
-4. Add OPENAI_API_KEY in Secrets
-5. Deploy the app
-
----
-
-## 📈 Future Improvements
-
-* Voice-based chatbot
-* PDF document chat
-* Multi-language support
-* Database-based long-term memory
-* Image understanding chatbot
-
----
-
-## 👨‍💻 Author
-
-Kuldeep Singh
-
----
-
-## 📜 License
-
-This project is open-source and available under the MIT License.
-
----
+```bash
+git clone https://github.com/your-username/yolo-object-detection.git
+cd yolo-object-detection
 
