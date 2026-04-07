@@ -1,55 +1,81 @@
+"""
+==========================================
+YOLO Object Detection App (Stable Version)
+==========================================
+Author: Kuldeep Singh 😎
+==========================================
+"""
+
 import streamlit as st
-import wikipedia
+from ultralytics import YOLO
+import numpy as np
+from PIL import Image
 
 # ==============================
-# 🎨 UI
+# 🎨 PAGE CONFIG
 # ==============================
-st.set_page_config(page_title="AI Chatbot (Smart Free)", page_icon="🤖")
+st.set_page_config(page_title="YOLO Detection", page_icon="🎯")
 
-st.title("🤖 AI Chatbot (Smart FREE)")
+st.title("🎯 YOLO Object Detection")
 st.markdown("Built by **Kuldeep Singh** 🚀")
 
 # ==============================
-# 🧠 FUNCTION
+# 📦 LOAD MODEL (CACHED)
 # ==============================
-def get_answer(query):
-    try:
-        result = wikipedia.summary(query, sentences=2)
-        return result
-    except wikipedia.exceptions.DisambiguationError as e:
-        return f"⚠ Be more specific. Options: {e.options[:3]}"
-    except wikipedia.exceptions.PageError:
-        return "❌ Sorry, I couldn't find information."
-    except:
-        return "⚠ Something went wrong."
+@st.cache_resource
+def load_model():
+    model = YOLO("yolov8n.pt")  # small & fast model
+    return model
+
+try:
+    model = load_model()
+    st.success("✅ Model Loaded Successfully")
+except:
+    st.error("❌ Model failed to load")
+    st.stop()
 
 # ==============================
-# 💬 MEMORY
+# 📂 IMAGE UPLOAD
 # ==============================
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# ==============================
-# DISPLAY CHAT
-# ==============================
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.write(msg["content"])
+uploaded_file = st.file_uploader(
+    "Upload an image",
+    type=["jpg", "jpeg", "png"]
+)
 
 # ==============================
-# INPUT
+# 🔍 DETECTION
 # ==============================
-user_input = st.chat_input("Ask anything...")
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
+    img = np.array(image)
 
-    with st.chat_message("user"):
-        st.write(user_input)
+    with st.spinner("🔍 Detecting objects..."):
+        try:
+            results = model(img)
 
-    with st.chat_message("assistant"):
-        with st.spinner("Searching... 🔍"):
-            answer = get_answer(user_input)
-            st.write(answer)
+            # Draw boxes
+            annotated = results[0].plot()
 
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+            st.image(annotated, caption="Detected Objects", use_column_width=True)
+
+            # ==============================
+            # 📊 SHOW RESULTS
+            # ==============================
+            st.subheader("📊 Detection Summary")
+
+            names = model.names
+            detected = results[0].boxes.cls.tolist()
+
+            if detected:
+                detected_names = [names[int(cls)] for cls in detected]
+
+                for obj in set(detected_names):
+                    count = detected_names.count(obj)
+                    st.write(f"👉 {obj}: {count}")
+            else:
+                st.warning("No objects detected")
+
+        except Exception as e:
+            st.error(f"❌ Error: {e}")
